@@ -73,7 +73,7 @@ public class Messenger {
                         .thenCompose(updatedChatRoot -> updatedChatRoot.uploadOrReplaceFile(ChatController.PRIVATE_CHAT_STATE,
                                 AsyncReader.build(rawPrivateChatState), rawPrivateChatState.length, network, crypto, x -> {},
                                 crypto.random.randomBytes(32), Optional.of(Bat.random(crypto.random)), updatedChatRoot.mirrorBatId()))
-                        .thenCompose(newRoot -> ChatController.getChatMessageStore(newRoot, context)
+                        .thenCompose(newRoot -> ChatController.getChatMessageStore(newRoot, context, network)
                                 .thenApply(messageStore -> new ChatController(chatId, chat, messageStore,
                                         privateChatState, newRoot, cache, context))))
                 .thenCompose(controller -> controller.join(context.signer))
@@ -289,6 +289,6 @@ public class Messenger {
     private CompletableFuture<MessageStore> getMessageStoreMirror(String username, String uuid) {
         return context.getByPath(getChatPath(username, uuid))
                 .thenApply(Optional::get)
-                .thenCompose(d -> ChatController.getChatMessageStore(d, context));
+                .thenCompose(d -> ChatController.getChatMessageStore(d, context, context.network));
     }
 }

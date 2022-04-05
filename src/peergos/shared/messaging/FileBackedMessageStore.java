@@ -94,7 +94,7 @@ public class FileBackedMessageStore implements MessageStore {
     }
 
     @Override
-    public CompletableFuture<Snapshot> addMessages(Snapshot initialVersion, Committer committer, long msgIndex, List<SignedMessage> msgs) {
+    public CompletableFuture<Snapshot> addMessages(NetworkAccess network, Snapshot initialVersion, Committer committer, long msgIndex, List<SignedMessage> msgs) {
         ByteArrayOutputStream buf = new ByteArrayOutputStream();
         List<Integer> sizes = new ArrayList<>();
         for (SignedMessage msg : msgs) {

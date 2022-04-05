@@ -284,7 +284,7 @@ public class MessagingTests {
         }
 
         @Override
-        public CompletableFuture<Snapshot> addMessages(Snapshot initialVersion, Committer committer, long msgIndex, List<SignedMessage> msgs) {
+        public CompletableFuture<Snapshot> addMessages(NetworkAccess network, Snapshot initialVersion, Committer committer, long msgIndex, List<SignedMessage> msgs) {
             if (messages.size() != msgIndex)
                 throw new IllegalStateException();
             messages.addAll(msgs);

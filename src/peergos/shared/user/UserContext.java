@@ -2006,6 +2006,14 @@ public class UserContext {
         return entrie.getByPath(absolutePath, version, crypto.hasher, network);
     }
 
+    public CompletableFuture<Optional<FileWrapper>> getByPath(String path, Snapshot version, NetworkAccess network) {
+        if (path.equals("/"))
+            return CompletableFuture.completedFuture(Optional.of(FileWrapper.createRoot(entrie)));
+        FileProperties.ensureValidPath(path);
+        String absolutePath = path.startsWith("/") ? path : "/" + path;
+        return entrie.getByPath(absolutePath, version, crypto.hasher, network);
+    }
+
     public CompletableFuture<FileWrapper> getUserRoot() {
         return getByPath("/" + username).thenApply(opt -> opt.get());
     }
