@@ -136,7 +136,7 @@ public class FileBackedMessageStore implements MessageStore {
     }
 
     @Override
-    public synchronized CompletableFuture<Snapshot> revokeAccess(Set<String> usernames, Snapshot s, Committer c) {
-        return context.unShareReadAccessWith(sharedDir, usernames, s, c);
+    public synchronized CompletableFuture<Snapshot> revokeAccess(NetworkAccess network, Set<String> usernames, Snapshot s, Committer c) {
+        return context.unShareReadAccessWith(sharedDir, usernames, s, c, network);
     }
 }

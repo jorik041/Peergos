@@ -278,7 +278,7 @@ public class ChatController {
         // 4. append messages
         // 5. commit state file
         boolean noRemovals = u.toRevokeAccess.isEmpty();
-        return (noRemovals ? Futures.of(in) : store.revokeAccess(u.toRevokeAccess, in, c))
+        return (noRemovals ? Futures.of(in) : store.revokeAccess(network, u.toRevokeAccess, in, c))
                 .thenCompose(s -> Futures.reduceAll(u.mediaToCopy, s, (v, f) -> mirrorMedia(f, this, mirrorUsername, v, network, c),
                         (a, b) -> a.merge(b))
                         .thenCompose(s2 -> root.getUpdated(s2, network)

@@ -14,5 +14,5 @@ public interface MessageStore {
 
     CompletableFuture<Snapshot> addMessages(NetworkAccess network, Snapshot initialVersion, Committer committer, long msgIndex, List<SignedMessage> msgs);
 
-    CompletableFuture<Snapshot> revokeAccess(Set<String> usernames, Snapshot initialVersion, Committer committer);
+    CompletableFuture<Snapshot> revokeAccess(NetworkAccess network, Set<String> usernames, Snapshot initialVersion, Committer committer);
 }

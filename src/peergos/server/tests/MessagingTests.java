@@ -292,7 +292,7 @@ public class MessagingTests {
         }
 
         @Override
-        public CompletableFuture<Snapshot> revokeAccess(Set<String> usernames, Snapshot initialVersion, Committer committer) {
+        public CompletableFuture<Snapshot> revokeAccess(NetworkAccess network, Set<String> usernames, Snapshot initialVersion, Committer committer) {
             return Futures.of(new Snapshot(Collections.emptyMap()));
         }
 

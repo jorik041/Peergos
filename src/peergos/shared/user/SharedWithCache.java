@@ -222,7 +222,7 @@ public class SharedWithCache {
         return p.getName(p.getNameCount() - 1).toString();
     }
 
-    public CompletableFuture<Map<Path, SharedWithState>> getAllDescendantShares(Path start, Snapshot s) {
+    public CompletableFuture<Map<Path, SharedWithState>> getAllDescendantShares(Path start, Snapshot s, NetworkAccess network) {
         return base.getUpdated(base.version.mergeAndOverwriteWith(s), network)
                 .thenCompose(freshBase -> freshBase.getDescendentByPath(toRelative(start.getParent()).toString(), crypto.hasher, network))
                 .thenCompose(opt -> {
@@ -240,7 +240,7 @@ public class SharedWithCache {
                             ).thenCompose(m -> parent.getChild(filename, crypto.hasher, network)
                                     .thenCompose(copt -> copt.isEmpty() ?
                                             Futures.of(m) :
-                                            getAllDescendantSharesRecurse(copt.get(), start)
+                                            getAllDescendantSharesRecurse(copt.get(), start, network)
                                                     .thenApply(d -> merge(d, m))));
                 });
     }
@@ -251,7 +251,7 @@ public class SharedWithCache {
         return res;
     }
 
-    public CompletableFuture<Map<Path, SharedWithState>> getAllDescendantSharesRecurse(FileWrapper f, Path toUs) {
+    public CompletableFuture<Map<Path, SharedWithState>> getAllDescendantSharesRecurse(FileWrapper f, Path toUs, NetworkAccess network) {
         if (! f.isDirectory()) {
             if (! f.getName().equals(DIR_CACHE_FILENAME))
                 throw new IllegalStateException("Invalid shared with cache!");
@@ -260,15 +260,15 @@ public class SharedWithCache {
         }
         return f.getChildren(crypto.hasher, network)
                 .thenCompose(children -> Futures.combineAll(children.stream()
-                        .map(c -> getAllDescendantSharesRecurse(c, toUs.resolve(c.getName())))
+                        .map(c -> getAllDescendantSharesRecurse(c, toUs.resolve(c.getName()), network))
                         .collect(Collectors.toList())))
                 .thenApply(s -> s.stream()
                         .flatMap(m -> m.entrySet().stream())
                         .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue())));
     }
 
-    public CompletableFuture<Map<Path, Set<String>>> getAllReadShares(Path start, Snapshot s) {
-        return getAllDescendantShares(start, s)
+    public CompletableFuture<Map<Path, Set<String>>> getAllReadShares(Path start, Snapshot s, NetworkAccess network) {
+        return getAllDescendantShares(start, s, network)
                 .thenApply(m -> m.entrySet().stream()
                         .flatMap(e -> e.getValue().readShares().entrySet()
                                 .stream()
@@ -276,8 +276,8 @@ public class SharedWithCache {
                         .collect(Collectors.toMap(p -> p.left, p -> p.right)));
     }
 
-    public CompletableFuture<Map<Path, Set<String>>> getAllWriteShares(Path start, Snapshot s) {
-        return getAllDescendantShares(start, s)
+    public CompletableFuture<Map<Path, Set<String>>> getAllWriteShares(Path start, Snapshot s, NetworkAccess network) {
+        return getAllDescendantShares(start, s, network)
                 .thenApply(m -> m.entrySet().stream()
                         .flatMap(e -> e.getValue().writeShares().entrySet()
                                 .stream()
